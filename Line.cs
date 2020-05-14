@@ -5,6 +5,9 @@ using System.Text;
 
 namespace ShapeFinderV2
 {
+    /// <summary>
+    /// Class to hold all information about a line.
+    /// </summary>
     public class Line
     {
         private Point _prev;
@@ -20,29 +23,58 @@ namespace ShapeFinderV2
             End = initial;
         }
 
+        /// <summary>
+        /// Start co-ordinate.
+        /// </summary>
         public Point Start { get; set; }
+
+        /// <summary>
+        /// End co-ordinate.
+        /// </summary>
         public Point End { get; set; }
+
+        /// <summary>
+        /// The largest deviation from the pure line.
+        /// </summary>
         public double MaxVariance { get; private set; } = 0;
+
+        /// <summary>
+        /// The amount of deviation from the pure line.
+        /// Essentially indicates how straight the line is.
+        /// </summary>
         public double AvVariance
         {
             get {  return _totalVariance / _varianceCount; }
         }
 
+        /// <summary>
+        /// Calculated angle of the line from start to finish.
+        /// </summary>
         public double Angle
         {
-            get { return CalculateAngle(Start, End); }
+            get { return Geometry.CalculateAngle(Start, End); }
         }
 
+        /// <summary>
+        /// The calculated lenght between the start and end.
+        /// </summary>
         public double LengthBetweenPoints
         {
             get
             {
-                return CalculateDistance(Start, End);
+                return Geometry.CalculateDistance(Start, End);
             }
         }
 
+        /// <summary>
+        /// Accumulation of lengths between all the points that make up the line.
+        /// </summary>
         public double LengthFromAccumulation { get; private set; } = 0;
 
+        /// <summary>
+        /// Add a new point to the start of the line.
+        /// </summary>
+        /// <param name="p">New point</param>
         public void AdjustStart(Point p)
         {
             if (p == Start)
@@ -50,19 +82,24 @@ namespace ShapeFinderV2
                 return;
             }
 
-            double angle = CalculateAngle(p, Start);
+            double angle = Geometry.CalculateAngle(p, Start);
             double variance = angle - _prevAngle;
             if (Math.Abs(variance) > MaxVariance)
             {
                 MaxVariance = Math.Abs(variance);
             }
 
-            LengthFromAccumulation += CalculateDistance(p, Start);
+            // Adjust data.
+            LengthFromAccumulation += Geometry.CalculateDistance(p, Start);
             _totalVariance += variance;
             _varianceCount++;
             Start = p;
         }
 
+        /// <summary>
+        /// Add a new point to the end of the line.
+        /// </summary>
+        /// <param name="p">New point</param>
         public void AdjustEnd(Point p)
         {
             if (p == End)
@@ -70,35 +107,43 @@ namespace ShapeFinderV2
                 return;
             }
 
-            double angle = CalculateAngle(End, p);
+            double angle = Geometry.CalculateAngle(End, p);
             double variance = angle - _prevAngle;
             if (Math.Abs(variance) > MaxVariance)
             {
                 MaxVariance = Math.Abs(variance);
             }
 
-            LengthFromAccumulation += CalculateDistance(End, p);
+            // Adjust data.
+            LengthFromAccumulation += Geometry.CalculateDistance(End, p);
             _totalVariance += variance;
             _varianceCount++;
             End = p;
         }
 
+        /// <summary>
+        /// Add next point in the line.
+        /// </summary>
+        /// <param name="p"></param>
         public void Add(Point p)
         {
             if (Start == End)
             {
                 // Calculate the first angle.
-                _prevAngle = CalculateAngle(Start, p);
+                _prevAngle = Geometry.CalculateAngle(Start, p);
             }
             else
             {
-                double angle = CalculateAngle(End, p);
+                // Compare the angle of this point and the end, to the last calculated
+                // angle. The difference will indicate the straightness of the line.
+                double angle = Geometry.CalculateAngle(End, p);
                 double variance = angle - _prevAngle;
                 if (Math.Abs(variance) > MaxVariance)
                 {
                     MaxVariance = Math.Abs(variance);
                 }
 
+                // Update data.
                 _prevAngle = angle;
                 _prevVariance = variance;
                 _totalVariance += variance;
@@ -106,47 +151,24 @@ namespace ShapeFinderV2
             }
 
             // Increase distance.
-            LengthFromAccumulation += CalculateDistance(End, p);
+            LengthFromAccumulation += Geometry.CalculateDistance(End, p);
 
             _prev = End;
             End = p;
         }
 
+        /// <summary>
+        /// Remove the last point from the line.
+        /// Currently this can only be done once as only the data for the second
+        /// last point is kept in the _prev variable.
+        /// This is for adjustment purposes.
+        /// </summary>
         public void RemoveLast()
         {
-            LengthFromAccumulation -= CalculateDistance(_prev, End);
+            LengthFromAccumulation -= Geometry.CalculateDistance(_prev, End);
             _totalVariance -= _prevVariance;
             _varianceCount--;
             End = _prev;
-        }
-
-        private double CalculateAngle(Point a, Point b)
-        {
-            int opposite = a.Y - b.Y;
-            int adjacent = b.X - a.X;
-
-            // Need to handle possible divide by 0 situ.
-            if (adjacent == 0)
-            {
-                if (opposite == 0)
-                {
-                    return 0;
-                }
-
-                return opposite > 0 ? 90 : 270;
-            }
-
-            double angle = Math.Atan2(opposite, adjacent) * (180 / Math.PI);
-
-            return angle < 0 ? angle + 360 : angle;
-        }
-
-        private double CalculateDistance(Point a, Point b)
-        {
-            double x = Math.Pow(a.X - b.X, 2);
-            double y = Math.Pow(a.Y - b.Y, 2);
-
-            return Math.Sqrt(x + y);
         }
     }
 }

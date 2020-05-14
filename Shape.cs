@@ -4,10 +4,16 @@ using System.Drawing;
 
 namespace ShapeFinderV2
 {
+    /// <summary>
+    /// Class that holds the final shape data.
+    /// </summary>
     public class Shape
     {
         // Angle threshold that indicates a corner.
         private readonly double _threshold;
+
+        // Collection of all pixel co-ordinates. Used to determine rough area
+        // for circle detection.
         private readonly Dictionary<int, List<int>> _pixels;
 
         public Shape(List<Point> contour, Dictionary<int, List<int>> pixels, double threshold)
@@ -47,8 +53,14 @@ namespace ShapeFinderV2
                 return new Point(x, y);
             }
         }
+
+        // Type of shape.
         public string Type { get; private set; }
+
+        // How confident the inference is.
         public string Confidence { get; private set; }
+
+        // Rough approximation of area.
         public int PixelCount
         {
             get
@@ -63,6 +75,10 @@ namespace ShapeFinderV2
             }
         }
 
+        /// <summary>
+        /// Crawl around contour and detect straight lines from corners.
+        /// </summary>
+        /// <returns></returns>
         private List<Line> FindLines()
         {
             // Init boundaries.
@@ -130,6 +146,12 @@ namespace ShapeFinderV2
             return lines;
         }
 
+        /// <summary>
+        /// Determine the co-ordinates of the corners using the intersection of
+        /// adjacent lines.
+        /// </summary>
+        /// <param name="lines"></param>
+        /// <returns></returns>
         private List<Corner> FindCorners(List<Line> lines)
         {
             var corners = new List<Corner>();
@@ -154,24 +176,24 @@ namespace ShapeFinderV2
             {
                 a = lines[i - 1];
                 b = lines[i];
-                corner = FindIntersection(a, b);
+                corner = Geometry.FindIntersection(a, b);
 
                 corners.Add(new Corner()
                 {
                     Coordinate = corner,
-                    Angle = AngleDifference(a, b)
+                    Angle = Geometry.AngleDifference(a, b)
                 });
             }
 
             // Compare first and last lines to get final corner.
             a = lines[^1];
             b = lines[0];
-            corner = FindIntersection(a, b);
+            corner = Geometry.FindIntersection(a, b);
 
             corners.Add(new Corner()
             {
                 Coordinate = corner,
-                Angle = AngleDifference(a, b)
+                Angle = Geometry.AngleDifference(a, b)
             });
 
             // Add corner co-ordinates to the corresponding lines, if not
@@ -188,9 +210,11 @@ namespace ShapeFinderV2
             return corners;
         }
 
+        /// <summary>
+        /// Use data points to infer what shape it is.
+        /// </summary>
         private void InferShape()
         {
-            // Circle
             if (Lines.Count == 1 || Corners.Count > 4)
             {
                 ProcessCircle();
@@ -208,36 +232,7 @@ namespace ShapeFinderV2
                 ProcessQuad();
                 return;
             }
-        }
-
-        private Point FindIntersection(Line line1, Line line2)
-        {
-            Point s1 = line1.Start;
-            Point e1 = line1.End;
-            Point s2 = line2.Start;
-            Point e2 = line2.End;
-
-            float a1 = e1.Y - s1.Y;
-            float b1 = s1.X - e1.X;
-            float c1 = a1 * s1.X + b1 * s1.Y;
-
-            float a2 = e2.Y - s2.Y;
-            float b2 = s2.X - e2.X;
-            float c2 = a2 * s2.X + b2 * s2.Y;
-
-            float delta = a1 * b2 - a2 * b1;
-
-            int x = Convert.ToInt32((b2 * c1 - b1 * c2) / delta);
-            int y = Convert.ToInt32((a1 * c2 - a2 * c1) / delta);
-
-            return new Point(x, y);
-        }
-
-        private double AngleDifference(Line a, Line b)
-        {
-            double angle = a.Angle - b.Angle;
-            return angle < 0 ? angle + 360 : angle;
-        }
+        } 
 
         private void ProcessCircle()
         {

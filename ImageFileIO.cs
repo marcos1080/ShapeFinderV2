@@ -5,15 +5,21 @@ using System.IO;
 
 namespace ShapeFinderV2
 {
-    public class ImageLoader
+    /// <summary>
+    /// Simple class for loading images from a folder.
+    /// </summary>
+    public class ImageFileIO
     {
-        public ImageLoader(string directory)
+        public ImageFileIO(string directory)
         {
             DirectoryPath = directory;
         }
 
         public string DirectoryPath { get; set; }
 
+        /// <summary>
+        /// Property that retreives all the filenames from a directory.
+        /// </summary>
         public string[] FileNames
         {
             get
@@ -28,6 +34,10 @@ namespace ShapeFinderV2
             }
         }
 
+        /// <summary>
+        /// Get all images in directory.
+        /// </summary>
+        /// <returns></returns>
         public List<Bitmap> GetImages()
         {
             var images = new List<Bitmap>();
@@ -39,7 +49,12 @@ namespace ShapeFinderV2
             return images;
         }
 
-        public Bitmap GetImages(string fileName)
+        /// <summary>
+        /// Get single image.
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public Bitmap GetImage(string fileName)
         {
             return new Bitmap($"{DirectoryPath}/{fileName}");
         }

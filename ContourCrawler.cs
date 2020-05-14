@@ -5,6 +5,10 @@ using System.Text;
 
 namespace ShapeFinderV2
 {
+    /// <summary>
+    /// Class that measures the rate of change between points.
+    /// Can measure rate of change between 3 - 4 points.
+    /// </summary>
     public class ContourCrawler
     {
         private Point _a;
@@ -17,7 +21,15 @@ namespace ShapeFinderV2
             _a = a;
         }
 
+        /// <summary>
+        /// Start point of crawler along line.
+        /// </summary>
         public Point Start { get { return _a; } }
+
+        /// <summary>
+        /// End point of crawler along line.
+        /// The length of the line segment can be between 1 and 4 points.
+        /// </summary>
         public Point End { 
             get 
             { 
@@ -39,38 +51,55 @@ namespace ShapeFinderV2
             } 
         }
 
+        /// <summary>
+        /// Angle between the start and end points.
+        /// </summary>
         public double Angle 
         {
             get
             {
-                return CalculateAngle(_a, End);
+                return Geometry.CalculateAngle(_a, End);
             }
         }
 
+        /// <summary>
+        /// Calculate the difference in angle between 2 line segments.
+        /// </summary>
         public double Deviation
         {
             get
             {
                 double a, b;
 
+                // If the line segment measured is less than 3 points there will be no deviation.
                 if (_a == End || _b == End)
                 {
                     return 0;
-                } else if (_c == End)
+                } 
+                
+                // Only 3 points present. Can measure deviation but not as accurate as 4.
+                if (_c == End)
                 {
-                    a = CalculateAngle(_a, _b.Value);
-                    b = CalculateAngle(_b.Value, _c.Value);
+                    a = Geometry.CalculateAngle(_a, _b.Value);
+                    b = Geometry.CalculateAngle(_b.Value, _c.Value);
 
                     return a - b;
                 }
 
-                a = CalculateAngle(_a, _b.Value);
-                b = CalculateAngle(_c.Value, _d.Value);
+                // 4 points present. will give best results.
+                a = Geometry.CalculateAngle(_a, _b.Value);
+                b = Geometry.CalculateAngle(_c.Value, _d.Value);
 
                 return a - b;
             }
         }
 
+        /// <summary>
+        /// Add a new point to be measured.
+        /// If the number of points present is 4 then the oldest one gets
+        /// removed and the others shuffle down, leaving room for the new one at the front.
+        /// </summary>
+        /// <param name="newPoint"></param>
         public void Add(Point newPoint)
         {
             if (_d.HasValue)
@@ -92,27 +121,6 @@ namespace ShapeFinderV2
             {
                 _d = newPoint;
             }
-        }
-
-        private double CalculateAngle(Point a, Point b)
-        {
-            int opposite = a.Y - b.Y;
-            int adjacent = b.X - a.X;
-
-            // Need to handle possible divide by 0 situ.
-            if (adjacent == 0)
-            {
-                if (opposite == 0)
-                {
-                    return 0;
-                }
-
-                return opposite > 0 ? 90 : 270;
-            }
-
-            double angle = Math.Atan2(opposite, adjacent) * (180 / Math.PI);
-
-            return angle < 0 ? angle + 360 : angle;
         }
     }
 }

@@ -5,29 +5,29 @@ using System.Text;
 
 namespace ShapeFinderV2
 {
-    public class ImageConverter
+    /// <summary>
+    /// Class that contains colour manipulation methods.
+    /// </summary>
+    public static class ImageConverter
     {
-        private readonly string _outputPath;
-        private readonly int _threshold = 5;
-
-        public ImageConverter(string outputPath)
+        public static Bitmap ToBlackAndWhite(Bitmap image, int threshold)
         {
-            _outputPath = outputPath;
-        }
+            // Find the grey hue of the background colour.
+            Color backgroundColour = image.GetPixel(0, 0);
+            int backgroundGrey = ConvertToGrey(backgroundColour);
 
-        public Bitmap ToBlackAndWhite(Bitmap image)
-        {
-            Color background = image.GetPixel(0, 0);
-            int backgroundGrey = Convert.ToInt32(.21 * background.R + .71 * background.G + .071 * background.B);
-
+            // Convert all pixels to either black or white.
             for (int y = 0; y < image.Height; y++)
             {
                 for (int x = 0; x < image.Width; x++)
                 {
-                    Color c = image.GetPixel(x, y);
-                    int grey = Convert.ToInt32(.21 * c.R + .71 * c.G + .071 * c.B);
+                    // Convert pixel colour to greyscale value.
+                    Color colour = image.GetPixel(x, y);
+                    int grey = ConvertToGrey(colour);
 
-                    grey = Math.Abs(backgroundGrey - grey) > _threshold ? 0 : 255;
+                    // If the colour differs from the background more than the threshold
+                    // pixel colour is white, otherwise black.
+                    grey = Math.Abs(backgroundGrey - grey) > threshold ? 0 : 255;
                     image.SetPixel(x, y, Color.FromArgb(grey, grey, grey));
                 }
             }
@@ -35,14 +35,9 @@ namespace ShapeFinderV2
             return image;
         }
 
-        public void Show(Bitmap image)
+        private static int ConvertToGrey(Color colour)
         {
-            throw new NotImplementedException();
-        }
-
-        public void Save(Bitmap image, string fileName)
-        {
-            image.Save($"{_outputPath}/{fileName}");
+            return Convert.ToInt32(.21 * colour.R + .71 * colour.G + .071 * colour.B);
         }
     }
 }

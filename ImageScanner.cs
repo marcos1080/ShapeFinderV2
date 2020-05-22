@@ -59,7 +59,6 @@ namespace ShapeFinderV2
                 // Can finalise it and remove it from the current shape list.
                 if (_expected != null)
                 {
-                    _expected.Value.Finalise();
                     Shapes.Add(_expected.Value);
                     _currentShapes.Remove(_expected);
                 }
@@ -140,7 +139,6 @@ namespace ShapeFinderV2
                     // Pixel is positioned to the right of the last shape.
                     // This means that the expected shape has not been hit.
                     // Move from working list to finalised shape list.
-                    _expected.Value.Finalise();
                     Shapes.Add(_expected.Value);
                     _currentShapes.Remove(_expected);
                 }

@@ -14,6 +14,7 @@ namespace ShapeFinderV2
             string imageSaveFolderPath = ""; // Insert path to save images here.
 
             var imageLoader = new ImageFileIO(imageFolderPath);
+            var processor = new ShapeProcessor(threshold);
             
             Bitmap image;
             ImageScanner scanner;
@@ -26,7 +27,7 @@ namespace ShapeFinderV2
                 image = imageLoader.GetImage(filename);
 
                 // Convert to black and white for easier detection.
-                ImageConverter.ToBlackAndWhite(image, 5);
+                ImageConverter.ToBlackAndWhite(image, 3);
 
                 // Scan image for shapes.
                 scanner = new ImageScanner(image);
@@ -37,14 +38,15 @@ namespace ShapeFinderV2
                 // Get shape data from scanner.
                 foreach (ShapeData s in scanner.Shapes)
                 {
-                    shapes.Add(new Shape(s.Contour, s.Pixels, threshold));
+                    Shape shape = processor.InferShape(s.Pixels);
+                    shapes.Add(shape);
                 }
 
                 // Output
                 foreach (Shape s in shapes)
                 {
                     // Write result to console.
-                    Console.WriteLine($"Type: {s.Type}, Confidence: {s.Confidence}");
+                    Console.WriteLine($"Type: {s.Type}, Area: {s.Area:F2}, Confidence: {s.Confidence}");
 
                     // Draw contour on image.
                     foreach (Point c in s.Contour)

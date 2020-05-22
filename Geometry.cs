@@ -44,7 +44,8 @@ namespace ShapeFinderV2
         public static double AngleDifference(Line a, Line b)
         {
             double angle = a.Angle - b.Angle;
-            return angle < 0 ? angle + 360 : angle;
+            angle = angle < 0 ? angle + 360 : angle;
+            return 180 - angle;
         }
 
         /// <summary>

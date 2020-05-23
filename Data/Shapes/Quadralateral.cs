@@ -5,6 +5,9 @@ using System.Text;
 
 namespace ShapeFinderV2
 {
+    /// <summary>
+    /// Quadralateral shape.
+    /// </summary>
     public class Quadralateral : Shape
     {
         private enum Types
@@ -25,6 +28,9 @@ namespace ShapeFinderV2
         {
         }
 
+        /// <summary>
+        /// Type of quadralateral.
+        /// </summary>
         public override string Type 
         {
             get
@@ -86,22 +92,32 @@ namespace ShapeFinderV2
                     double line3Angle = Lines[2].Angle >= 180 ? Lines[2].Angle - 180 : Lines[2].Angle;
                     double line4Angle = Lines[3].Angle >= 180 ? Lines[3].Angle - 180 : Lines[3].Angle;
 
+                    // Check if either opposite sides are parallel.
                     if (Math.Abs(line1Angle - line3Angle) < aThreshold || Math.Abs(line2Angle - line4Angle) < aThreshold)
                     {
                         type = Types.Trapezoid;
                     }
+                    // Check if either opposite angles are equal.
                     else if (Math.Abs(aa - ca) < aThreshold || Math.Abs(ba - da) < aThreshold)
                     {
                         type = Types.Kite;
                     }
+
+                    // If these checks fail then quadralateral.
                 }
 
                 return type.ToString();
             }
         }
 
+        /// <summary>
+        /// Determine how confinent the inference has been.
+        /// </summary>
         public override string Confidence { get { return base.Confidence; } }
 
+        /// <summary>
+        /// Area of any quadralateral..
+        /// </summary>
         public override double Area 
         {
             get

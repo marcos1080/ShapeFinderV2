@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Text;
+﻿using System.Drawing;
 
 namespace ShapeFinderV2
 {
@@ -69,7 +66,7 @@ namespace ShapeFinderV2
         {
             get
             {
-                double a, b;
+                double a, b, result;
 
                 // If the line segment measured is less than 3 points there will be no deviation.
                 if (_a == End || _b == End)
@@ -83,15 +80,34 @@ namespace ShapeFinderV2
                     a = Geometry.CalculateAngle(_a, _b.Value);
                     b = Geometry.CalculateAngle(_b.Value, _c.Value);
 
-                    return a - b;
+                    return AngleDiff(a, b);
                 }
 
                 // 4 points present. will give best results.
                 a = Geometry.CalculateAngle(_a, _b.Value);
                 b = Geometry.CalculateAngle(_c.Value, _d.Value);
 
-                return a - b;
+                return AngleDiff(a, b);
             }
+        }
+
+        /// <summary>
+        /// Need to adjust the difference to account for direction.
+        /// Must be within range of -180 - 180, not 0 - 360.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        private double AngleDiff(double a, double b)
+        {
+            double result = a - b;
+
+            if (result > 180)
+            {
+                result = 360 - result;
+            }
+
+            return result;
         }
 
         /// <summary>

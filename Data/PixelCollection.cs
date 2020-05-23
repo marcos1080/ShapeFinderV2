@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Drawing;
 
 namespace ShapeFinderV2
 {
@@ -7,13 +8,14 @@ namespace ShapeFinderV2
         public PixelCollection(int x, int y)
         {
             Top = y;
-            Rows = new Dictionary<int, List<int>>();
+            Rows = new Dictionary<int, SortedList<int, int>>();
             Left = x;
             Right = x;
             Count = 0;
         }
 
-        public Dictionary<int, List<int>> Rows { get; private set; }
+        // Each Y row contains the X pixel locations.
+        public Dictionary<int, SortedList<int, int>> Rows { get; private set; }
 
         // Initial Y co-ordinate.
         public int Top { get; }
@@ -33,6 +35,15 @@ namespace ShapeFinderV2
         /// <summary>
         /// Add a new pixel to the shape.
         /// </summary>
+        /// <param name="p"></param>
+        public void AddPixel(Point p)
+        {
+            AddPixel(p.X, p.Y);
+        }
+
+        /// <summary>
+        /// Add a new pixel to the shape.
+        /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
         public void AddPixel(int x, int y)
@@ -40,17 +51,20 @@ namespace ShapeFinderV2
             // New line
             if (!Rows.ContainsKey(y))
             {
-                Rows.Add(y, new List<int>());
-
-                // Adjust left bounds.
-                if (x < Left)
-                {
-                    Left = x;
-                }
+                Rows.Add(y, new SortedList<int, int>());
             }
 
             // Add x co-ord to y line.
-            Rows[y].Add(x);
+            if (!Rows[y].ContainsKey(x))
+            {
+                Rows[y].Add(x, x);
+            }
+
+            // Adjust left bounds.
+            if (x < Left)
+            {
+                Left = x;
+            }
 
             // Adjust right bounds.
             if (x > Right)
@@ -61,6 +75,11 @@ namespace ShapeFinderV2
             Count++;
         }
 
+        /// <summary>
+        /// Check if the pixel collection has a n existing Y row.
+        /// </summary>
+        /// <param name="y"></param>
+        /// <returns></returns>
         public bool HasRow(int y)
         {
             if (Rows.ContainsKey(y))

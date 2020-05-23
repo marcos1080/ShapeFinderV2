@@ -9,12 +9,13 @@ namespace ShapeFinderV2
     {
         static void Main(string[] args)
         {
-            double threshold = 30;
+            double cornerAngleThreshold = 30;
+            int colourDifferenceThreshold = 3;
             string imageFolderPath = ""; // Insert path to save images here.
             string imageSaveFolderPath = ""; // Insert path to save images here.
 
             var imageLoader = new ImageFileIO(imageFolderPath);
-            var processor = new ShapeProcessor(threshold);
+            var processor = new ShapeProcessor(cornerAngleThreshold);
             
             Bitmap image;
             ImageScanner scanner;
@@ -24,13 +25,11 @@ namespace ShapeFinderV2
             foreach (string filename in imageLoader.FileNames)
             {
                 Console.WriteLine($"File '{filename}'");
+                Console.WriteLine();
                 image = imageLoader.GetImage(filename);
 
-                // Convert to black and white for easier detection.
-                ImageConverter.ToBlackAndWhite(image, 3);
-
                 // Scan image for shapes.
-                scanner = new ImageScanner(image);
+                scanner = new ImageScanner(image, colourDifferenceThreshold);
                 scanner.Scan();
 
                 shapes = new List<Shape>();
@@ -38,7 +37,7 @@ namespace ShapeFinderV2
                 // Get shape data from scanner.
                 foreach (ShapeData s in scanner.Shapes)
                 {
-                    Shape shape = processor.InferShape(s.Pixels);
+                    Shape shape = processor.InferShape(s);
                     shapes.Add(shape);
                 }
 
@@ -46,7 +45,7 @@ namespace ShapeFinderV2
                 foreach (Shape s in shapes)
                 {
                     // Write result to console.
-                    Console.WriteLine($"Type: {s.Type}, Area: {s.Area:F2}, Confidence: {s.Confidence}");
+                    Console.WriteLine($"Type: {s.Type,-35}| Area: {s.Area,-10:F2}| Confidence: {s.Confidence}");
 
                     // Draw contour on image.
                     foreach (Point c in s.Contour)
@@ -71,6 +70,7 @@ namespace ShapeFinderV2
                     // Save.
                     image.Save($"{imageSaveFolderPath}/{filename}");
                 }
+                Console.WriteLine();
             }
         }
     }

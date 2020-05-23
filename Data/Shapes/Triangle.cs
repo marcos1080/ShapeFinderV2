@@ -4,6 +4,9 @@ using System.Drawing;
 
 namespace ShapeFinderV2
 {
+    /// <summary>
+    /// Triangle shape.
+    /// </summary>
     public class Triangle : Shape
     {
         private enum Types
@@ -27,6 +30,9 @@ namespace ShapeFinderV2
         {
         }
 
+        /// <summary>
+        /// Type of triangle.
+        /// </summary>
         public override string Type
         {
             get
@@ -78,8 +84,14 @@ namespace ShapeFinderV2
             }
         }
 
+        /// <summary>
+        /// Determine how confinent the inference has been.
+        /// </summary>
         public override string Confidence { get { return base.Confidence; } }
 
+        /// <summary>
+        /// Area of any triangle.
+        /// </summary>
         public override double Area
         {
             get 

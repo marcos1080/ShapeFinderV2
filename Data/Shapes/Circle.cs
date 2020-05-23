@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Text;
 
 namespace ShapeFinderV2
 {
+    /// <summary>
+    /// Circle shape
+    /// </summary>
     public class Circle : Shape
     {
         public Circle(List<Point> contour,
@@ -14,8 +16,14 @@ namespace ShapeFinderV2
         {
         }
 
+        /// <summary>
+        /// Circle.
+        /// </summary>
         public override string Type { get { return "Circle"; } }
 
+        /// <summary>
+        /// Radius of circle.
+        /// </summary>
         public double Radius { 
             get 
             { 
@@ -23,6 +31,9 @@ namespace ShapeFinderV2
             }
         }
 
+        /// <summary>
+        /// Area of circle.
+        /// </summary>
         public override double Area
         {
             get
@@ -31,6 +42,9 @@ namespace ShapeFinderV2
             }
         }
 
+        /// <summary>
+        /// Determine how confinent the inference has been.
+        /// </summary>
         public override string Confidence
         {
             get
@@ -48,7 +62,7 @@ namespace ShapeFinderV2
                     int testX = Center.X + Convert.ToInt32(Math.Round((Radius + varianceLimit) * Math.Cos(degrees * Math.PI / 180), 1, 0));
                     int testY = Center.Y + Convert.ToInt32(Math.Round((Radius + varianceLimit) * Math.Sin(degrees * Math.PI / 180), 1, 0));
 
-                    if (Pixels.Rows.ContainsKey(testY) && Pixels.Rows[testY].Contains(testX))
+                    if (Pixels.Rows.ContainsKey(testY) && Pixels.Rows[testY].ContainsKey(testX))
                     {
                         OK = false;
                     }
@@ -57,7 +71,7 @@ namespace ShapeFinderV2
                     testX = Center.X + Convert.ToInt32(Math.Round((Radius - varianceLimit) * Math.Cos(degrees * Math.PI / 180), 1, 0));
                     testY = Center.Y + Convert.ToInt32(Math.Round((Radius - varianceLimit) * Math.Sin(degrees * Math.PI / 180), 1, 0));
 
-                    if (!(Pixels.Rows.ContainsKey(testY) && Pixels.Rows[testY].Contains(testX)))
+                    if (!(Pixels.Rows.ContainsKey(testY) && Pixels.Rows[testY].ContainsKey(testX)))
                     {
                         OK = false;
                     }

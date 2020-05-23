@@ -10,7 +10,7 @@ namespace ShapeFinderV2
         static void Main(string[] args)
         {
             double cornerAngleThreshold = 30;
-            int colourDifferenceThreshold = 3;
+            int colourDifferenceThreshold = 10;
             string imageFolderPath = ""; // Insert path to save images here.
             string imageSaveFolderPath = ""; // Insert path to save images here.
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ShapeFinderV2.Data.Shapes;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 
@@ -24,6 +25,10 @@ namespace ShapeFinderV2
             Circle,
             Triangle,
             Quadralateral,
+            Pentagon,
+            Hexagon,
+            Heptagon,
+            Octogon,
             Unknown,
             Invalid
         }
@@ -56,6 +61,14 @@ namespace ShapeFinderV2
                     return new Triangle(data.Contour, data.Pixels, lines, corners);
                 case ShapeType.Quadralateral:
                     return new Quadralateral(data.Contour, data.Pixels, lines, corners);
+                case ShapeType.Pentagon:
+                    return new Pentagon(data.Contour, data.Pixels, lines, corners);
+                case ShapeType.Hexagon:
+                    return new Hexagon(data.Contour, data.Pixels, lines, corners);
+                case ShapeType.Heptagon:
+                    return new Heptagon(data.Contour, data.Pixels, lines, corners);
+                case ShapeType.Octogon:
+                    return new Octagon(data.Contour, data.Pixels, lines, corners);
                 default:
                     throw new Exception();
             }
@@ -189,7 +202,7 @@ namespace ShapeFinderV2
         /// </summary>
         private ShapeType InferShape(List<Line> lines, List<Corner> corners, PixelCollection pixels)
         {
-            if (lines.Count == 1 || corners.Count > 4)
+            if (lines.Count == 1 || corners.Count > 8)
             {
                 return ShapeType.Circle;
             }
@@ -202,6 +215,26 @@ namespace ShapeFinderV2
             if (corners.Count == 4)
             {
                 return ShapeType.Quadralateral;
+            }
+
+            if (corners.Count == 5)
+            {
+                return ShapeType.Pentagon;
+            }
+
+            if (corners.Count == 6)
+            {
+                return ShapeType.Hexagon;
+            }
+
+            if (corners.Count == 7)
+            {
+                return ShapeType.Heptagon;
+            }
+
+            if (corners.Count == 8)
+            {
+                return ShapeType.Octogon;
             }
 
             return ShapeType.Unknown;
